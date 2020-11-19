@@ -25,6 +25,9 @@ app.get("/", (req, res) => {
     res.json({ message: "Welcome to reseau-nda application." });
 });
 
+//Connect server to Angular project
+app.use('*', express.static(path.join(__dirname, './front/dist')));
+
 const userRouter = require('./app/routes/user.routes');
 const postRouter = require('./app/routes/post.routes');
 const tagRouter = require('./app/routes/tag.routes');

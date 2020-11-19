@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/frontend/node_modules
 
 # profiling files
 chrome-profiler-events*.json
@@ -40,3 +41,4 @@ testem.log
 Thumbs.db
 /app/config/db.config.js
 test_requests.rest
+server.test.js
