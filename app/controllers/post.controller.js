@@ -3,6 +3,21 @@ const Post = db.posts;
 const Tag = db.tags;
 const Op = db.Sequelize.Op;
 
+const getPagingData = (data, page, limit) => {
+    const { count: totalItems, rows: posts } = data;
+    const currentPage = page ? +page : 0;
+    const totalPages = Math.ceil(totalItems / limit);
+    return { totalItems, posts, totalPages, currentPage };
+};
+
+const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const offset = page ? page * limit : 0;
+
+    return { limit, offset };
+};
+
+
 // Create and Save a new Post
 exports.create = (req, res) => {
     const tagIds = req.body.tagIds ? JSON.parse(req.body.tagIds) : undefined;
@@ -54,11 +69,13 @@ exports.create = (req, res) => {
 
 // Retrieve all Posts from the database.
 exports.findAll = (req, res) => {
-    const title = req.query.title;
+    const { page, size, title } = req.query;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
-
-    Post.findAll({
-        where: condition,
+    const { limit, offset } = getPagination(page, size);
+    
+    
+    Post.findAndCountAll({
+        where: condition, limit, offset,
         include: [
             {
                 model: Tag,
@@ -71,7 +88,9 @@ exports.findAll = (req, res) => {
         ]
     })
         .then(data => {
-            res.send(data);
+            console.log(data);
+            const response = getPagingData(data, page, limit);
+            res.send(response);
         })
         .catch(err => {
             res.status(500).send({
