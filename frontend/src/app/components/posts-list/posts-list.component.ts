@@ -53,6 +53,7 @@ export class PostsListComponent implements OnInit {
           this.posts = posts;
           this.count = totalItems;
           console.log(data);
+          console.log(data.posts);
         },
         error => {
           console.log(error);
@@ -88,18 +89,6 @@ export class PostsListComponent implements OnInit {
         response => {
           console.log(response);
           this.retrievePosts();
-        },
-        error => {
-          console.log(error);
-        });
-  }
-
-  searchTitle(): void {
-    this.postService.findByTitle(this.title)
-      .subscribe(
-        data => {
-          this.posts = data;
-          console.log(data);
         },
         error => {
           console.log(error);

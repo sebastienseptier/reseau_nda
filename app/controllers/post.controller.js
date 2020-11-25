@@ -72,10 +72,12 @@ exports.findAll = (req, res) => {
     const { page, size, title } = req.query;
     var condition = title ? { title: { [Op.like]: `%${title}%` } } : null;
     const { limit, offset } = getPagination(page, size);
-    
-    
+
+
     Post.findAndCountAll({
         where: condition, limit, offset,
+        distinct: true,
+        order: [['updatedAt', 'DESC']],
         include: [
             {
                 model: Tag,
@@ -88,7 +90,6 @@ exports.findAll = (req, res) => {
         ]
     })
         .then(data => {
-            console.log(data);
             const response = getPagingData(data, page, limit);
             res.send(response);
         })
@@ -195,8 +196,14 @@ exports.deleteAll = (req, res) => {
 
 // Find all published Posts
 exports.findAllPublished = (req, res) => {
-    Post.findAll({
-        where: { published: true },
+    const { page, size, title } = req.query;
+    var condition = title ? { title: { [Op.like]: `%${title}%` }, published: true } : { published: true };
+    const { limit, offset } = getPagination(page, size);
+
+    Post.findAndCountAll({
+        where: condition, limit, offset,
+        distinct: true,
+        order: [['updatedAt', 'DESC']],
         include: [
             {
                 model: Tag,
@@ -209,7 +216,9 @@ exports.findAllPublished = (req, res) => {
         ]
     })
         .then(data => {
-            res.send(data);
+            console.log(data);
+            const response = getPagingData(data, page, limit);
+            res.send(response);
         })
         .catch(err => {
             res.status(500).send({
@@ -224,6 +233,10 @@ exports.findAllTagged = (req, res) => {
     // Validate request
     const tagIds = req.body.tagIds ? JSON.parse(req.body.tagIds) : undefined;
 
+    const { page, size, title } = req.query;
+    var condition = title ? { title: { [Op.like]: `%${title}%` }, published: true } : { published: true };
+    const { limit, offset } = getPagination(page, size);
+
     if (!tagIds) {
         res.status(400).send({
             message: "Content can not be empty!"
@@ -231,8 +244,10 @@ exports.findAllTagged = (req, res) => {
         return;
     }
 
-    Post.findAll({
-        where: { published: true },
+    Post.findAndCountAll({
+        where: condition, limit, offset,
+        distinct: true,
+        order: [['updatedAt', 'DESC']],
         include: [
             {
                 model: Tag,
@@ -250,7 +265,9 @@ exports.findAllTagged = (req, res) => {
         ]
     })
         .then(data => {
-            res.send(data);
+            console.log(data)
+            const response = getPagingData(data, page, limit);
+            res.send(response);
         })
         .catch(err => {
             res.status(500).send({

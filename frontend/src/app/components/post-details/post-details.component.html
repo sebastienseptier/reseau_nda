@@ -1,66 +1,48 @@
 <div style="width: 400px; margin: auto;">
-    <div *ngIf="currentPost" class="edit-form">
-      <h4>Post</h4>
-      <form>
-        <div class="form-group">
-          <label for="title">Title</label>
-          <input
-            type="text"
-            class="form-control"
-            id="title"
-            [(ngModel)]="currentPost.title"
-            name="title"
-          />
-        </div>
-        <div class="form-group">
-          <label for="description">Description</label>
-          <input
-            type="text"
-            class="form-control"
-            id="description"
-            [(ngModel)]="currentPost.description"
-            name="description"
-          />
-        </div>
-  
-        <div class="form-group">
-          <label><strong>Status:</strong></label>
-          {{ currentPost.published ? "Published" : "Pending" }}
-        </div>
-      </form>
-  
-      <button
-        class="badge badge-primary mr-2"
-        *ngIf="currentPost.published"
-        (click)="updatePublished(false)"
-      >
-        UnPublish
-      </button>
-      <button
-        *ngIf="!currentPost.published"
-        class="badge badge-primary mr-2"
-        (click)="updatePublished(true)"
-      >
-        Publish
-      </button>
-  
-      <button class="badge badge-danger mr-2" (click)="deletePost()">
-        Delete
-      </button>
-  
-      <button
-        type="submit"
-        class="badge badge-success"
-        (click)="updatePost()"
-      >
-        Update
-      </button>
-      <p>{{ message }}</p>
-    </div>
-  
-    <div *ngIf="!currentPost">
-      <br />
-      <p>Cannot access this Post...</p>
-    </div>
+  <div *ngIf="currentPost" class="edit-form">
+    <h4>Post</h4>
+    <form>
+      <div class="form-group">
+        <label for="title">Title</label>
+        <input type="text" class="form-control" id="title" [(ngModel)]="currentPost.title" name="title" />
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <input type="text" class="form-control" id="description" [(ngModel)]="currentPost.description"
+          name="description" />
+      </div>
+
+      <div *ngIf="currentPost" class="form-group">
+        <label for="tags">Tags</label>
+        <input *ngFor="let tag of tags" type="button" value="{{ tag.name }}" id="{{ tag.id }}" title="{{ tag.description }}"
+          class="btn btn-light btn-sm mb-1" [ngClass]="{'usedTag': checkUsedTags(tag.id)}" (click)="toggleTagAssociation($event.target.id);">
+      </div>
+
+      <div class="form-group">
+        <label><strong>Status:</strong></label>
+        {{ currentPost.published ? "Published" : "Pending" }}
+      </div>
+    </form>
+
+    <button class="badge badge-primary mr-2" *ngIf="currentPost.published" (click)="updatePublished(false)">
+      UnPublish
+    </button>
+    <button *ngIf="!currentPost.published" class="badge badge-primary mr-2" (click)="updatePublished(true)">
+      Publish
+    </button>
+
+    <button class="badge badge-danger mr-2" (click)="deletePost()">
+      Delete
+    </button>
+
+    <button type="submit" class="badge badge-success" (click)="updatePost()">
+      Update
+    </button>
+    <p>{{ message }}</p>
   </div>
-  
+
+  <div *ngIf="!currentPost">
+    <br />
+    <p>Cannot access this Post...</p>
+  </div>
+</div>

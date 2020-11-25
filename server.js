@@ -26,7 +26,7 @@ app.get("/", (req, res) => {
 });
 
 //Connect server to Angular project
-app.use('*', express.static(path.join(__dirname, './front/dist')));
+//app.use('*', express.static(path.join(__dirname, './front/dist')));
 
 const userRouter = require('./app/routes/user.routes');
 const postRouter = require('./app/routes/post.routes');

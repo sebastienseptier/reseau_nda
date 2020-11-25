@@ -3,7 +3,7 @@
         <div class="input-group mb-3">
             <input type="text" class="form-control" placeholder="Search by title" [(ngModel)]="title" />
             <div class="input-group-append">
-                <button class="btn btn-outline-secondary" type="button" (click)="searchTitle()">
+                <button class="btn btn-outline-secondary" type="button" (click)="retrievePosts()">
                     Search
                 </button>
             </div>
@@ -25,6 +25,7 @@
           let i = index
         " [class.active]="i == currentIndex" (click)="setActivePost(post, i)">
                 {{ post.title }}
+                <span *ngFor="let tag of post.tags" class="badge badge-success" title="{{ tag.description }}">{{ tag.name }}</span>
             </li>
         </ul>
 
@@ -49,8 +50,12 @@
                 {{ currentPost.description }}
             </div>
             <div>
+                <label><strong>Tags:</strong></label>
+                {{ currentPost.tags.join(', ') }}
+            </div>
+            <div>
                 <label><strong>Status:</strong></label>
-                {{ currentPost.published ? "Published" : "Pending" }}
+                <span *ngFor="let tag of currentPost.tags" class="badge badge-success" title="{{ tag.description }}">{{ tag.name }}</span>
             </div>
 
             <a class="badge badge-warning" routerLink="/postes/{{ currentPost.id }}">

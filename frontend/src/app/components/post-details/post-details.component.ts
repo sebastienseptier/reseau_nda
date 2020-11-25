@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from 'src/app/services/post.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TagService } from 'src/app/services/tag.service';
 
 @Component({
   selector: 'app-post-details',
@@ -11,15 +12,18 @@ export class PostDetailsComponent implements OnInit {
 
   currentPost = null;
   message = '';
+  tags = null;
 
   constructor(
     private postService: PostService,
+    private tagService: TagService,
     private route: ActivatedRoute,
     private router: Router) { }
 
   ngOnInit(): void {
     this.message = '';
     this.getPost(this.route.snapshot.paramMap.get('id'));
+    this.retrieveTags();
   }
 
   getPost(id): void {
@@ -74,5 +78,42 @@ export class PostDetailsComponent implements OnInit {
         error => {
           console.log(error);
         });
+  }
+
+  retrieveTags(): void {
+    this.tagService.getAll()
+      .subscribe(
+        data => {
+          this.tags = data;
+        },
+        error => {
+          console.log(error);
+        });
+  }
+
+  checkUsedTags(tagId) {
+    if (tagId && this.currentPost.tags)
+      return this.currentPost.tags.find(t => t.id == tagId);
+    else
+      return null;
+  }
+
+  async toggleTagAssociation(tagId) {
+    let response;
+
+    if (!this.checkUsedTags(tagId)) {
+      console.log("add")
+      const data = {
+        postId: this.currentPost.id,
+        tagId: tagId
+      };
+      response = await this.postService.addTag(data);
+    }
+    else {
+      console.log("delete")
+      response = await this.postService.deleteTag(this.currentPost.id, tagId);
+    }
+    this.message = response.message;
+    this.getPost(this.route.snapshot.paramMap.get('id'));
   }
 }

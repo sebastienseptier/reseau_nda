@@ -38,4 +38,12 @@ export class PostService {
   findByTitle(title): Observable<any> {
     return this.http.get(`${baseUrl}?title=${title}`);
   }
+
+  async addTag(data) {
+    return await this.http.post(`${baseUrl}/tags`, data).toPromise();
+  }
+
+  async deleteTag(postId, tagId) {
+    return await this.http.delete(`${baseUrl}/${postId}/tags/${tagId}`).toPromise();
+  }
 }
