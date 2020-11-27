@@ -46,4 +46,8 @@ export class PostService {
   async deleteTag(postId, tagId) {
     return await this.http.delete(`${baseUrl}/${postId}/tags/${tagId}`).toPromise();
   }
+
+  findByTagsAndTitle(params, tagIds): Observable<any> {
+    return this.http.get(`${baseUrl}/tags?tagIds=[${tagIds}]`, { params });
+  }
 }

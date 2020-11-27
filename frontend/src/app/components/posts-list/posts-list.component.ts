@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from 'src/app/services/post.service';
+import { TagService } from 'src/app/services/tag.service';
 
 @Component({
   selector: 'app-posts-list',
@@ -12,16 +13,31 @@ export class PostsListComponent implements OnInit {
   currentPost = null;
   currentIndex = -1;
   title = '';
+  tags = null;
+  usedTagIds = [];
 
   page = 1;
   count = 0;
   pageSize = 3;
   pageSizes = [3, 6, 9];
 
-  constructor(private postService: PostService) { }
+  constructor(private postService: PostService,
+    private tagService: TagService) { }
 
   ngOnInit(): void {
     this.retrievePosts();
+    this.retrieveTags();
+  }
+
+  retrieveTags(): void {
+    this.tagService.getAll()
+      .subscribe(
+        data => {
+          this.tags = data;
+        },
+        error => {
+          console.log(error);
+        });
   }
 
   getRequestParams(searchTitle, page, pageSize): any {
@@ -46,7 +62,8 @@ export class PostsListComponent implements OnInit {
   retrievePosts(): void {
     const params = this.getRequestParams(this.title, this.page, this.pageSize);
 
-    this.postService.getAll(params)
+    if (this.usedTagIds.length === 0) {
+      this.postService.getAll(params)
       .subscribe(
         data => {
           const { posts, totalItems } = data;
@@ -58,6 +75,22 @@ export class PostsListComponent implements OnInit {
         error => {
           console.log(error);
         });
+    }
+    else {
+      this.postService.findByTagsAndTitle(params, this.usedTagIds.toString())
+      .subscribe(
+        data => {
+          const { posts, totalItems } = data;
+          this.posts = posts;
+          this.count = totalItems;
+          console.log(data);
+          console.log(data.posts);
+        },
+        error => {
+          console.log(error);
+        });
+    }
+    
 
   }
 
@@ -93,5 +126,44 @@ export class PostsListComponent implements OnInit {
         error => {
           console.log(error);
         });
+  }
+
+  checkUsedTags(tagId) {
+    if (tagId && this.usedTagIds)
+      return this.usedTagIds.find(id => id == tagId);
+    else
+      return false;
+  }
+
+  toggleTagFilter(tagId): void {
+    const params = this.getRequestParams(this.title, this.page, this.pageSize);
+
+    if (this.checkUsedTags(tagId)) {
+      var index = this.usedTagIds.indexOf(tagId);
+      if (index !== -1) {
+        this.usedTagIds.splice(index, 1);
+      }
+    }
+    else {
+      this.usedTagIds.push(tagId);
+    }
+
+    if (this.usedTagIds.length > 0) {
+      this.postService.findByTagsAndTitle(params, this.usedTagIds)
+      .subscribe(
+        data => {
+          const { posts, totalItems } = data;
+          this.posts = posts;
+          this.count = totalItems;
+          console.log(data);
+          console.log(data.posts);
+        },
+        error => {
+          console.log(error);
+        });
+    }
+    else {
+      this.retrievePosts();
+    }
   }
 }

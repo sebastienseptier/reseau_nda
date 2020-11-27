@@ -231,8 +231,7 @@ exports.findAllPublished = (req, res) => {
 // Find all Posts by tag ID
 exports.findAllTagged = (req, res) => {
     // Validate request
-    const tagIds = req.body.tagIds ? JSON.parse(req.body.tagIds) : undefined;
-
+    let tagIds = req.query.tagIds ? JSON.parse(req.query.tagIds) : undefined;
     const { page, size, title } = req.query;
     var condition = title ? { title: { [Op.like]: `%${title}%` }, published: true } : { published: true };
     const { limit, offset } = getPagination(page, size);
@@ -243,7 +242,11 @@ exports.findAllTagged = (req, res) => {
         });
         return;
     }
+    else {
+        tagIds = (tagIds.toString()).replace(/, +/g, ",").split(",").map(Number);
+    }
 
+    console.log(tagIds)
     Post.findAndCountAll({
         where: condition, limit, offset,
         distinct: true,

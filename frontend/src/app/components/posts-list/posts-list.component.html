@@ -1,7 +1,7 @@
 <div class="list row">
     <div class="col-md-8">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" placeholder="Search by title" [(ngModel)]="title" />
+            <input type="text" class="form-control" placeholder="Search by title" [(ngModel)]="title" (keyup.enter)="retrievePosts()"/>
             <div class="input-group-append">
                 <button class="btn btn-outline-secondary" type="button" (click)="retrievePosts()">
                     Search
@@ -9,14 +9,15 @@
             </div>
         </div>
     </div>
-    <div class="col-md-12">
-        <pagination-controls previousLabel="Prev" nextLabel="Next" responsive="true"
-            (pageChange)="handlePageChange($event)"></pagination-controls>
-    </div>
+    <div *ngIf="tags" class="form-group col-md-12">
+        <label for="tags">Tags</label>
+        <input *ngFor="let tag of tags" type="button" value="{{ tag.name }}" id="{{ tag.id }}" title="{{ tag.description }}"
+          class="btn btn-light btn-sm mb-1" [ngClass]="{'usedTag': checkUsedTags(tag.id)}" (click)="toggleTagFilter($event.target.id);">
+      </div>
     <div class="col-md-6">
         <h4>Posts List</h4>
         <ul class="list-group">
-            <li class="list-group-item" *ngFor="
+            <li class="list-group-item" [ngClass]="{'list-group-item-light': !post.published}" *ngFor="
           let post of posts | paginate : {
                   itemsPerPage: pageSize,
                   currentPage: page,
@@ -24,10 +25,18 @@
                 };
           let i = index
         " [class.active]="i == currentIndex" (click)="setActivePost(post, i)">
-                {{ post.title }}
-                <span *ngFor="let tag of post.tags" class="badge badge-success" title="{{ tag.description }}">{{ tag.name }}</span>
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ post.title }}</h5>
+            <small>3 days ago</small>
+          </div>
+                
+                <span *ngFor="let tag of post.tags" class="badge" [ngClass]="(post.published)?'badge-success':'badge-secondary'" title="{{ tag.description }}">{{ tag.name }}</span>
             </li>
         </ul>
+        <div class="col-md-12">
+            <pagination-controls previousLabel="Prev" nextLabel="Next" responsive="true"
+                (pageChange)="handlePageChange($event)"></pagination-controls>
+        </div>
 
         <button class="m-3 btn btn-sm btn-danger" (click)="removeAllPosts()">
             Remove All
@@ -51,11 +60,11 @@
             </div>
             <div>
                 <label><strong>Tags:</strong></label>
-                {{ currentPost.tags.join(', ') }}
+                <span *ngFor="let tag of currentPost.tags" class="badge badge-success" title="{{ tag.description }}">{{ tag.name }}</span>
             </div>
             <div>
                 <label><strong>Status:</strong></label>
-                <span *ngFor="let tag of currentPost.tags" class="badge badge-success" title="{{ tag.description }}">{{ tag.name }}</span>
+                {{ currentPost.published ? "Published" : "Pending" }}
             </div>
 
             <a class="badge badge-warning" routerLink="/postes/{{ currentPost.id }}">
