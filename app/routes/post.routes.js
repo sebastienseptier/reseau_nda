@@ -14,6 +14,9 @@ router.get("/published", posts.findAllPublished);
 // Retrieve all Posts from tag ID
 router.get("/tags", posts.findAllTagged);
 
+// Retrieve all Posts from tag ID
+router.get("/tags/published", posts.findAllTaggedPublished);
+
 // Retrieve a single Post with id
 router.get("/:id", posts.findOne);
 

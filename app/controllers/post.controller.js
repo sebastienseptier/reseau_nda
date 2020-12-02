@@ -17,7 +17,6 @@ const getPagination = (page, size) => {
     return { limit, offset };
 };
 
-
 // Create and Save a new Post
 exports.create = (req, res) => {
     const tagIds = req.body.tagIds ? JSON.parse(req.body.tagIds) : undefined;
@@ -228,8 +227,8 @@ exports.findAllPublished = (req, res) => {
         });
 };
 
-// Find all Posts by tag ID
-exports.findAllTagged = (req, res) => {
+// Find all published Posts by tag ID
+exports.findAllTaggedPublished = (req, res) => {
     // Validate request
     let tagIds = req.query.tagIds ? JSON.parse(req.query.tagIds) : undefined;
     const { page, size, title } = req.query;
@@ -242,11 +241,7 @@ exports.findAllTagged = (req, res) => {
         });
         return;
     }
-    else {
-        tagIds = (tagIds.toString()).replace(/, +/g, ",").split(",").map(Number);
-    }
 
-    console.log(tagIds)
     Post.findAndCountAll({
         where: condition, limit, offset,
         distinct: true,
@@ -255,20 +250,64 @@ exports.findAllTagged = (req, res) => {
             {
                 model: Tag,
                 as: "tags",
+                required: true,
                 attributes: ["id", "name", "description"],
                 through: {
                     attributes: ["tagid", "postid"],
-                },
-                where: {
-                    id: {
-                        [Op.in]: tagIds
-                    }
                 }
             }
         ]
     })
         .then(data => {
-            console.log(data)
+            let filteredRows = data.rows.filter(post => tagIds.every(t => (post.tags.map(t => t.id)).includes(t)));
+            data.rows = filteredRows;
+            data.count = filteredRows.length;
+            const response = getPagingData(data, page, limit);
+            res.send(response);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message:
+                    err.message || "Some error occurred while retrieving posts."
+            });
+        });
+};
+
+// Find all Posts by tag ID
+exports.findAllTagged = (req, res) => {
+    // Validate request
+    let tagIds = req.query.tagIds ? JSON.parse(req.query.tagIds) : undefined;
+    const { page, size, title } = req.query;
+    var condition = title ? { title: { [Op.like]: `%${title}%` } } : {};
+    const { limit, offset } = getPagination(page, size);
+
+    if (!tagIds) {
+        res.status(400).send({
+            message: "Content can not be empty!"
+        });
+        return;
+    }
+
+    Post.findAndCountAll({
+        where: condition, limit, offset,
+        distinct: true,
+        order: [['updatedAt', 'DESC']],
+        include: [
+            {
+                model: Tag,
+                as: "tags",
+                required: true,
+                attributes: ["id", "name", "description"],
+                through: {
+                    attributes: ["tagid", "postid"],
+                }
+            }
+        ]
+    })
+        .then(data => {
+            let filteredRows = data.rows.filter(post => tagIds.every(t => (post.tags.map(t => t.id)).includes(t)));
+            data.rows = filteredRows;
+            data.count = filteredRows.length;
             const response = getPagingData(data, page, limit);
             res.send(response);
         })

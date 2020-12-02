@@ -27,7 +27,7 @@
         " [class.active]="i == currentIndex" (click)="setActivePost(post, i)">
         <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">{{ post.title }}</h5>
-            <small>3 days ago</small>
+            <small>{{ moment(post.updatedAt).fromNow() }}</small>
           </div>
                 
                 <span *ngFor="let tag of post.tags" class="badge" [ngClass]="(post.published)?'badge-success':'badge-secondary'" title="{{ tag.description }}">{{ tag.name }}</span>

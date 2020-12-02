@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from 'src/app/services/post.service';
 import { TagService } from 'src/app/services/tag.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-posts-list',
@@ -20,6 +21,7 @@ export class PostsListComponent implements OnInit {
   count = 0;
   pageSize = 3;
   pageSizes = [3, 6, 9];
+  moment: any = moment;
 
   constructor(private postService: PostService,
     private tagService: TagService) { }
