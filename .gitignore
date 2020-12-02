@@ -39,6 +39,6 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
-/app/config/db.config.js
+/app/config/
 test_requests.rest
 server.test.js
