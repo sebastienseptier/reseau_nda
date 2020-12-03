@@ -1,4 +1,5 @@
 const posts = require("../controllers/post.controller.js");
+const { authJwt } = require("../middlewares");
 
 var router = require("express").Router();
 
@@ -21,7 +22,7 @@ router.get("/tags/published", posts.findAllTaggedPublished);
 router.get("/:id", posts.findOne);
 
 // Update a Post with id
-router.put("/:id", posts.update);
+router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], posts.update);
 
 // Delete a Post with id
 router.delete("/:id", posts.delete);

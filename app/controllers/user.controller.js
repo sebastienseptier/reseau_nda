@@ -1,5 +1,20 @@
 const db = require("../models");
 const User = db.users;
+const Op = db.Sequelize.Op;
+
+const getPagingData = (data, page, limit) => {
+    const { count: totalItems, rows: users } = data;
+    const currentPage = page ? +page : 0;
+    const totalPages = Math.ceil(totalItems / limit);
+    return { totalItems, users, totalPages, currentPage };
+};
+
+const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const offset = page ? page * limit : 0;
+
+    return { limit, offset };
+};
 
 // Create and Save a new User
 exports.create = (req, res) => {
@@ -27,17 +42,23 @@ exports.create = (req, res) => {
 
 // Retrieve all Users from the database.
 exports.findAll = (req, res) => {
-    const email = req.query.email;
-    var condition = email ? { email: { [Op.like]: `%${email}%` } } : null;
+    const { page, size, name } = req.query;
+    var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+    const { limit, offset } = getPagination(page, size);
 
-    User.findAll({ where: condition })
+    User.findAndCountAll({
+        where: condition, limit, offset,
+        distinct: true,
+        order: [['updatedAt', 'DESC']]
+    })
         .then(data => {
-            res.send(data);
+            const response = getPagingData(data, page, limit);
+            res.send(response);
         })
         .catch(err => {
             res.status(500).send({
                 message:
-                    err.message || "Some error occurred while retrieving posts."
+                    err.message || "Some error occurred while retrieving users."
             });
         });
 };

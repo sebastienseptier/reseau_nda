@@ -1,0 +1,42 @@
+<div style="width: 400px; margin: auto;">
+    <div *ngIf="currentUser" class="edit-form">
+      <h4>User</h4>
+      <form>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" class="form-control" id="name" [(ngModel)]="currentUser.name" name="name" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="text" class="form-control" id="email" [(ngModel)]="currentUser.email"
+            name="email" />
+        </div>
+  
+        <div class="form-group">
+          <label><strong>Active:</strong></label>
+          {{ currentUser.active ? "Actif" : "Bloqué" }}
+        </div>
+      </form>
+  
+      <button class="badge badge-primary mr-2" *ngIf="currentUser.active" (click)="updateActive(false)">
+        UnActive
+      </button>
+      <button *ngIf="!currentUser.active" class="badge badge-primary mr-2" (click)="updateActive(true)">
+        Active
+      </button>
+  
+      <button class="badge badge-danger mr-2" (click)="deleteUser()">
+        Delete
+      </button>
+  
+      <button type="submit" class="badge badge-success" (click)="updateUser()">
+        Update
+      </button>
+      <p>{{ message }}</p>
+    </div>
+  
+    <div *ngIf="!currentUser">
+      <br />
+      <p>Cannot access this User...</p>
+    </div>
+  </div>

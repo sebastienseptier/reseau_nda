@@ -10,7 +10,7 @@ router.post("/", users.create);
 router.get("/", users.findAll);
 
 // Retrieve a single user with id
-router.get("/:id", [authJwt.verifyToken], users.findOne);
+router.get("/:id", [authJwt.verifyToken, authJwt.isModerator], users.findOne);
 
 // Update a user with id
 router.put("/:id", [authJwt.verifyToken, authJwt.isAdmin], users.update);
