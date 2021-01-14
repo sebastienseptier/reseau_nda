@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PostService } from 'src/app/services/post.service';
+import { TagService } from 'src/app/services/tag.service';
+import { TokenStorageService } from 'src/app/services/token-storage.service';
 
 @Component({
   selector: 'app-add-post',
@@ -12,20 +14,25 @@ export class AddPostComponent implements OnInit {
     title: '',
     description: '',
     published: false,
-    userId: null
+    userId: null,
+    tagIds: []
   };
   submitted = false;
+  tags = null;
 
-  constructor(private PostService: PostService) { }
+  constructor(private PostService: PostService, private TokenStorageService: TokenStorageService, private tagService: TagService) { }
 
   ngOnInit(): void {
+    this.retrieveTags();
   }
 
   savePost(): void {
+    let user = this.TokenStorageService.getUser();
     const data = {
       title: this.post.title,
       description: this.post.description,
-      userId: 2
+      userId: user.id,
+      tagIds: this.post.tagIds
     };
 
     this.PostService.create(data)
@@ -40,15 +47,44 @@ export class AddPostComponent implements OnInit {
   }
 
   newPost(): void {
+    let user = this.TokenStorageService.getUser();
     this.submitted = false;
-    /*
-    * TODO: Changer l'ID selon l'utilisateur
-    */
+
     this.post = {
       title: '',
       description: '',
       published: false,
-      userId: 2
+      userId: user.id,
+      tagIds: []
     };
+  }
+  
+  retrieveTags(): void {
+    this.tagService.getAll()
+      .subscribe(
+        data => {
+          this.tags = data;
+        },
+        error => {
+          console.log(error);
+        });
+  }
+
+  checkUsedTags(tagId) {
+    if (tagId && this.post.tagIds)
+      return this.post.tagIds.find(t => t == tagId);
+    else
+      return null;
+  }
+
+  async toggleTagAssociation(tagId) {
+
+    if (!this.checkUsedTags(tagId)) {
+      this.post.tagIds.push(tagId);
+    }
+    else {
+      this.post.tagIds = this.post.tagIds.filter(e => e !== tagId)
+    }
+    console.log(this.post.tagIds);
   }
 }

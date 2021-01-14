@@ -12,6 +12,12 @@
                     name="description" />
             </div>
 
+            <div *ngIf="tags" class="form-group">
+                <label for="tags">Tags</label>
+                <input *ngFor="let tag of tags" type="button" value="{{ tag.name }}" id="{{ tag.id }}" title="{{ tag.description }}"
+                  class="btn btn-light btn-sm mb-1" [ngClass]="{'usedTag': checkUsedTags(tag.id)}" (click)="toggleTagAssociation($event.target.id);">
+              </div>
+
             <button (click)="savePost()" class="btn btn-success">Submit</button>
         </div>
 

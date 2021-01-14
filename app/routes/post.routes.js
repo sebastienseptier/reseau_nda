@@ -4,13 +4,13 @@ const { authJwt } = require("../middlewares");
 var router = require("express").Router();
 
 // Create a new Post
-router.post("/", posts.create);
+router.post("/", [authJwt.verifyToken], posts.create);
 
 // Retrieve all Posts
-router.get("/", posts.findAll);
+router.get("/", [authJwt.verifyToken], posts.findAll);
 
 // Retrieve all published Posts
-router.get("/published", posts.findAllPublished);
+router.get("/published", [authJwt.verifyToken], posts.findAllPublished);
 
 // Retrieve all Posts from tag ID
 router.get("/tags", posts.findAllTagged);

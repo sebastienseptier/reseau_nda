@@ -19,7 +19,7 @@ const getPagination = (page, size) => {
 
 // Create and Save a new Post
 exports.create = (req, res) => {
-    const tagIds = req.body.tagIds ? JSON.parse(req.body.tagIds) : undefined;
+    const tagIds = req.body.tagIds ? req.body.tagIds : undefined;
     // Validate request
     if (!req.body.title || !req.body.description || !req.body.userId) {
         res.status(400).send({

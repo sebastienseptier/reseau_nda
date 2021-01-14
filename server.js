@@ -29,7 +29,7 @@ const db = require("./app/models");
 const Role = db.roles;
 db.sequelize.sync().then(() => {
     console.log('Resync Db');
-    initial();
+    //initial();
 });;
 
 // simple route
